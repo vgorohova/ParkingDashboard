@@ -5,7 +5,7 @@ import "./style.bundle.css";
 import "./App.scss";
 
 function App() {
-  console.log(getDateFromString("/Date(1676384718497+0200)/"));
+
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     AvailableParkingLots: 0,
@@ -16,6 +16,7 @@ function App() {
   });
   const [cars, setCars] = useState([]);
   const [allCars, setAllCars] = useState([]);
+  const [dayStats, setDayStats] = useState([]);
   const getData = () => {
     fetch("http://www.parkingapi.localdev/state", {method:'GET', headers: {'Accept':'application/json'}})
       .then((res) => {
@@ -32,15 +33,22 @@ function App() {
       })
       .then((res) => {
         setCars(res);
-        console.log(res);
       });
+
       fetch("http://www.parkingapi.localdev/all-cars", {method:'GET', headers: {'Accept':'application/json'}})
       .then((res) => {
         return res.json();
       })
       .then((res) => {
         setAllCars(res);
-        console.log(res);
+      });
+
+      fetch("http://www.parkingapi.localdev/parking-stats-day", {method:'GET', headers: {'Accept':'application/json'}})
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        setDayStats(res);
       });
   };
 
@@ -66,7 +74,7 @@ function App() {
           <div className="wrapper d-flex flex-column flex-row-fluid">
             <div className="content d-flex flex-column flex-column-fluid">
               <div className="container-xxl">
-                <h2 className="fs-3x mb-5">General info</h2>
+                <h2 className="fs-3x mb-5">Parking general info</h2>
                 <div className="row g-5 g-xl-8 mb-5 mb-xxl-8">
                   <div className="col-md-4">
                     <div className="card shadow-sm">
@@ -150,6 +158,32 @@ function App() {
                           <td>{getDateFromString(item.FirstTimeEntryDate)}</td>
                           <td>{getDateFromString(item.LastTimeEntryDate)}</td>
                           <td>{item.CarParkingStatus}</td>
+                        </tr>
+                        )
+                        })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <h2 className="fs-3x mb-5 mt-10">Parking Per Day Statistics</h2>
+                <div className="card shadow-sm">
+                  <div className="card-body">
+                    <div className="table-responsive">
+                      <table className="table">
+                        <thead>
+                          <tr className="fw-bold fs-6 text-gray-800">
+                            <th>Day</th>
+                            <th>Cars Count</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {dayStats.map((item, key)=>{
+
+                        return (
+                        <tr>
+                          <td>{getDateFromString(item.DayDate)}</td>
+                          <td>{item.CarsCountPerDay}</td>
                         </tr>
                         )
                         })}
